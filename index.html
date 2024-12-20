@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crypto Airdrop Manager</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+      /* General styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background-color: #f4f4f9;
+        color: #333;
+        margin: 0 auto;
+        max-width: 480px; /* Mobile-friendly container width */
+      }
+
+      /* Header */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .logo {
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .user-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #ccc;
+      }
+
+      /* Dashboard Overview */
+      .card {
+        background-color: #fff;
+        border-radius: 10px;
+        margin: 15px;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      /* Completion Progress Circle */
+      .progress-circle {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+      }
+
+      .progress-circle svg {
+        transform: rotate(-90deg);
+      }
+
+      .progress-circle circle {
+        fill: none;
+        stroke-width: 10;
+      }
+
+      .circle-bg {
+        stroke: #e5e7eb;
+      }
+
+      .circle-progress {
+        stroke: #22c55e;
+        stroke-dasharray: 283;
+        stroke-dashoffset: 283; /* Default: 0% progress */
+        stroke-linecap: round;
+      }
+
+      .progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 20px;
+        font-weight: bold;
+        color: #22c55e;
+      }
+
+      /* Stats */
+      .stats {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        margin-top: 15px;
+      }
+
+      .stats div {
+        font-size: 14px;
+      }
+
+      .stats .number {
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      /* New Airdrop Form */
+      .details {
+        background-color: #fff;
+        border-radius: 10px;
+        margin: 15px;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .details input {
+        width: calc(100% - 20px);
+        margin-bottom: 10px;
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      .details button {
+        padding: 10px 15px;
+        background-color: #22c55e;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      /* Rewards Page */
+      .rewards-page {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #f4f4f9;
+        padding: 20px;
+        overflow-y: auto;
+      }
+
+      .rewards-page h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .rewards-section {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .rewards-section h3 {
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+
+      .rewards-section button {
+        background-color: #22c55e;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .rewards-section button:hover {
+        background-color: #16a34a;
+      }
+
+
+      /* Bottom Navigation */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #fff;
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
+        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .bottom-nav div {
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+        cursor: pointer;
+      }
+
+      .bottom-nav div:hover {
+        color: #22c55e;
+      }
+
+      /* Mini Page for Saved Airdrops */
+      .airdrop-page {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #f4f4f9;
+        padding: 20px;
+        overflow-y: auto;
+      }
+
+      .airdrop-page h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .airdrop-details {
+        background-color: #fff;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .progress-circle {
+          width: 90px;
+          height: 90px;
+        }
+
+        .progress-text {
+          font-size: 16px;
+        }
+
+        .card-title {
+          font-size: 16px;
+        }
+
+        .details input {
+          padding: 6px;
+        }
+
+        .details button {
+          padding: 8px 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">Crypto Airdrop Manager</div>
+      <div class="user-icon"></div>
+    </div>
+
+    <!-- Dashboard Overview -->
+    <div class="card">
+      <div class="card-title">Dashboard Overview</div>
+      <div class="progress-circle">
+        <svg width="120" height="120">
+          <circle cx="60" cy="60" r="45" class="circle-bg"></circle>
+          <circle
+            cx="60"
+            cy="60"
+            r="45"
+            class="circle-progress"
+          ></circle>
+        </svg>
+        <div class="progress-text">0%</div>
+      </div>
+      <div class="stats">
+        <div>
+          <div class="number" id="active-airdrops">0</div>
+          <div>Active Airdrops</div>
+          <div class="copyright"> © 2024 AR RAD </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Airdrop Form -->
+    <div class="details">
+      <div class="card-title">New Airdrop</div>
+      <input type="text" id="airdrop-name" placeholder="Airdrop Name" />
+      <input type="url" id="airdrop-website" placeholder="Website URL" />
+      <input type="url" id="daily-check-in" placeholder="Daily Check-In URL" />
+      <input type="url" id="daily-transaction" placeholder="Daily Transaction URL" />
+      <input type="number" id="funding" placeholder="Funding Amount" />
+      <input type="date" id="expected-date" placeholder="Expected Date" />
+      <button onclick="saveAirdrop()">Save Airdrop</button>
+    </div>
+
+    <!-- Exchange Section (Coming Soon) -->
+    <div class="exchange" onclick="openExchangePage()">
+      <p>This Function Is Coming Soon</p>
+    </div>
+
+    <!-- Saved Airdrops Section -->
+    <div class="airdrop-page" id="airdrop-page">
+      <h2>Saved Airdrops</h2>
+      <div id="saved-airdrops"></div>
+      <button onclick="closeAirdropPage()">Close</button>
+    </div>
+
+    <!-- Rewards Section -->
+    <div class="rewards-page" id="rewards-page">
+      <h2>Rewards</h2>
+      
+      <!-- Get Free Crypto Section -->
+      <div class="rewards-section">
+        <h3>Get Free Crypto</h3>
+        <button onclick="window.open('https://wwp.aifolr.com/redirect-zone/d4e51a15', '_blank')">
+          Claim Now
+        </button>
+      </div>
+      
+      <!-- Your Reward Section -->
+      <div class="rewards-section">
+        <h3>Your Reward</h3>
+        <p>You will receive rewards here based on 👆 </p>
+      </div>
+
+      <button onclick="closeRewardsPage()">Close</button>
+    </div>
+
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div>
+        🌐
+        <div>Home</div>
+      </div>
+      <div onclick="openExchangePage()">
+        🔄
+        <div>Exchange</div>
+      </div>
+      <div onclick="showAirdropPage()">
+        💰
+        <div>My Airdrops</div>
+      </div>
+      <div onclick="showRewardsPage()">
+        🏆
+        <div>Get Rewards</div>
+      </div>
+    </div>
+
+    <!-- Copyright Section -->
+    <div class="copyright">
+      &copy; 2024 AR RAD. All rights reserved.
+    </div>
+
+    <!-- Telegram Integration and JavaScript -->
+    <script>
+      // Initialize Telegram Web App
+      const tg = window.Telegram.WebApp;
+      tg.expand(); // Expand the web app to full screen
+
+      // Save Airdrop Details in Local Storage
+      function saveAirdrop() {
+        const airdropName = document.getElementById("airdrop-name").value;
+        const website = document.getElementById("airdrop-website").value;
+        const checkIn = document.getElementById("daily-check-in").value;
+        const transaction = document.getElementById("daily-transaction").value;
+        const funding = document.getElementById("funding").value;
+        const expectedDate = document.getElementById("expected-date").value;
+
+        const airdrop = {
+          name: airdropName,
+          website,
+          checkIn,
+          transaction,
+          funding,
+          expectedDate
+        };
+
+        // Retrieve saved airdrops from localStorage or initialize as an empty array
+        let savedAirdrops = JSON.parse(localStorage.getItem("airdrops")) || [];
+
+        // Add new airdrop to the list
+        savedAirdrops.push(airdrop);
+
+        // Save the updated list back to localStorage
+        localStorage.setItem("airdrops", JSON.stringify(savedAirdrops));
+
+        // Reset the form fields
+        document.getElementById("airdrop-name").value = "";
+        document.getElementById("airdrop-website").value = "";
+        document.getElementById("daily-check-in").value = "";
+        document.getElementById("daily-transaction").value = "";
+        document.getElementById("funding").value = "";
+        document.getElementById("expected-date").value = "";
+
+        alert("Airdrop saved successfully!");
+        updateDashboard();
+      }
+
+      // Show Saved Airdrops Page
+      function showAirdropPage() {
+        const airdropPage = document.getElementById("airdrop-page");
+        const savedAirdropsContainer = document.getElementById("saved-airdrops");
+
+        // Clear the container
+        savedAirdropsContainer.innerHTML = "";
+
+        // Retrieve saved airdrops from localStorage
+        const savedAirdrops = JSON.parse(localStorage.getItem("airdrops")) || [];
+
+        if (savedAirdrops.length === 0) {
+          savedAirdropsContainer.innerHTML = "<p>No saved airdrops yet!</p>";
+        } else {
+          savedAirdrops.forEach((airdrop, index) => {
+            const airdropDetail = document.createElement("div");
+            airdropDetail.className = "airdrop-details";
+            airdropDetail.innerHTML = `
+                    <strong>${airdrop.name}</strong><br>
+                    <a href="${airdrop.website}" target="_blank">Website</a> |
+                    <a href="${airdrop.checkIn}" target="_blank">Daily Check-in</a> |
+                    <a href="${airdrop.transaction}" target="_blank">Daily Transaction</a><br>
+                    Funding: ${airdrop.funding}<br>
+                    Expected Date: ${airdrop.expectedDate}<br>
+              <button onclick="deleteAirdrop(${index})">Delete</button>
+            `;
+            savedAirdropsContainer.appendChild(airdropDetail);
+          });
+        }
+
+        airdropPage.style.display = "block";
+      }
+
+      // Close Saved Airdrops Page
+      function closeAirdropPage() {
+        document.getElementById("airdrop-page").style.display = "none";
+      }
+
+
+      // Delete an Airdrop
+      function deleteAirdrop(index) {
+        const savedAirdrops = JSON.parse(localStorage.getItem("airdrops")) || [];
+        savedAirdrops.splice(index, 1);
+        localStorage.setItem("airdrops", JSON.stringify(savedAirdrops));
+        showAirdropPage(); // Refresh the page
+        alert("Airdrop deleted successfully!");
+        updateDashboard();
+      }
+
+      // Update the Dashboard Overview stats
+      function updateDashboard() {
+        const savedAirdrops = JSON.parse(localStorage.getItem("airdrops")) || [];
+        const activeAirdrops = savedAirdrops.length;
+        document.getElementById("active-airdrops").textContent = activeAirdrops;
+
+        const progress = (activeAirdrops / 10) * 100; // Example: 10 as total number of airdrops for full completion
+        updateProgressCircle(progress);
+      }
+
+      // Initialize Progress Circle
+      function updateProgressCircle(progress) {
+        const circle = document.querySelector(".circle-progress");
+        const radius = circle.r.baseVal.value;
+        const circumference = 2 * Math.PI * radius;
+
+        circle.style.strokeDasharray = `${circumference}`;
+        circle.style.strokeDashoffset = `${circumference - (progress / 100) * circumference}`;
+        document.querySelector(".progress-text").textContent = `${progress}%`;
+      }
+
+      // Set initial progress (can be dynamically updated)
+      updateDashboard();
+
+      // Open Exchange Section
+      function openExchangePage() {
+        alert("This Function Is Coming Soon");
+      }
+
+
+       // Show the Rewards page
+      function showRewardsPage() {
+        document.getElementById("rewards-page").style.display = "block";
+      }
+
+      // Close the Rewards page
+      function closeRewardsPage() {
+        document.getElementById("rewards-page").style.display = "none";
+      }
+
+    </script>
+  </body>
+</html>

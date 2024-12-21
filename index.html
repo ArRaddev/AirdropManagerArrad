@@ -58,12 +58,12 @@
         margin-bottom: 10px;
       }
 
-      /* Completion Progress Circle */
+            /* Progress Circle */
       .progress-circle {
         position: relative;
         width: 120px;
         height: 120px;
-        margin: 0 auto;
+        margin: 20px auto;
       }
 
       .progress-circle svg {
@@ -72,7 +72,7 @@
 
       .progress-circle circle {
         fill: none;
-        stroke-width: 10;
+        stroke-width: 8;
       }
 
       .circle-bg {
@@ -84,6 +84,7 @@
         stroke-dasharray: 283;
         stroke-dashoffset: 283; /* Default: 0% progress */
         stroke-linecap: round;
+        transition: stroke-dashoffset 0.5s ease-out;
       }
 
       .progress-text {
@@ -91,10 +92,35 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        font-size: 20px;
+        font-size: 16px;
         font-weight: bold;
         color: #22c55e;
       }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .progress-circle {
+          width: 70px;
+          height: 70px;
+        }
+
+        .progress-text {
+          font-size: 14px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .progress-circle {
+          width: 50px;
+          height: 50px;
+        }
+
+        .progress-text {
+          font-size: 12px;
+        }
+      }
+
+
 
       /* Stats */
       .stats {
@@ -238,8 +264,8 @@
       /* Responsive Design */
       @media (max-width: 768px) {
         .progress-circle {
-          width: 90px;
-          height: 90px;
+          width: 120px;
+          height: 120px;
         }
 
         .progress-text {
@@ -303,11 +329,6 @@
       <button onclick="saveAirdrop()">Save Airdrop</button>
     </div>
 
-    <!-- Exchange Section (Coming Soon) -->
-    <div class="exchange" onclick="openExchangePage()">
-      <p>This Function Is Coming Soon</p>
-    </div>
-
     <!-- Saved Airdrops Section -->
     <div class="airdrop-page" id="airdrop-page">
       <h2>Saved Airdrops</h2>
@@ -355,11 +376,6 @@
         🏆
         <div>Get Rewards</div>
       </div>
-    </div>
-
-    <!-- Copyright Section -->
-    <div class="copyright">
-      &copy; 2024 AR RAD. All rights reserved.
     </div>
 
     <!-- Telegram Integration and JavaScript -->

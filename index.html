@@ -287,11 +287,6 @@
     </style>
   </head>
   <body>
-    <!-- Header -->
-    <div class="header">
-      <div class="logo">Crypto Airdrop Manager</div>
-      <div class="user-icon"></div>
-    </div>
 
     <!-- Dashboard Overview -->
     <div class="card">
@@ -317,6 +312,62 @@
       </div>
     </div>
 
+
+
+          <!-- Include popad.html (Popup) -->
+  <div id="popupContainer"></div>
+
+  <script>
+    // Load the popad.html content dynamically into index.html
+    function loadPopup() {
+      fetch('popad.html')
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('popupContainer').innerHTML = data;
+          // After loading popad.html, automatically show the popup
+          showPopupSequence();
+        });
+    }
+
+    // Call this function to load the popup on page load
+    window.onload = loadPopup;
+
+    // Function to show popup messages in sequence
+    function showPopupSequence() {
+      const messages = [
+        { header: "Welcome To Airdrop Manager", message: "Trusted By Crypto Bhai💎" },
+        { header: "Manage Your Airdrop", message: "Manage your airdrops efficiently without any wallet connection🌙." },
+        { header: "Get Started Now", message: "Lets Gooo Airdrop Hunters!" },
+      ];
+
+      let index = 0;
+      function showNextPopup() {
+        if (index < messages.length) {
+          openPopup(messages[index].header, messages[index].message);
+          index++;
+          setTimeout(showNextPopup, 3500); // Show next popup after 3.5 seconds
+        } else {
+          // Add the Close button after the last message
+          document.getElementById('popupCloseButton').style.display = 'block';
+        }
+      }
+
+      showNextPopup(); // Start showing popups in sequence
+    }
+
+    // Example of opening the popup
+    function openPopup(header, message) {
+      document.getElementById("popupHeader").textContent = header;
+      document.getElementById("popupMessage").textContent = message;
+      document.getElementById("popupOverlay").style.display = "flex";
+    }
+
+    // Function to close the popup
+    function closePopup() {
+      document.getElementById("popupOverlay").style.display = "none";
+    }
+  </script>
+
     <!-- New Airdrop Form -->
     <div class="details">
       <div class="card-title">New Airdrop</div>
@@ -328,6 +379,7 @@
       <input type="date" id="expected-date" placeholder="Expected Date" />
       <button onclick="saveAirdrop()">Save Airdrop</button>
     </div>
+
 
     <!-- Saved Airdrops Section -->
     <div class="airdrop-page" id="airdrop-page">
@@ -342,7 +394,7 @@
       
       <!-- Get Free Crypto Section -->
       <div class="rewards-section">
-        <h3>Get Free Crypto</h3>
+        <h3>Get Free Crypto and AP </h3>
         <button onclick="window.open('https://wwp.aifolr.com/redirect-zone/d4e51a15', '_blank')">
           Claim Now
         </button>
@@ -351,7 +403,7 @@
       <!-- Your Reward Section -->
       <div class="rewards-section">
         <h3>Your Reward</h3>
-        <p>You will receive rewards here based on 👆 </p>
+        <p>You will receive rewards and AP Based on 👆 </p>
       </div>
 
       <button onclick="closeRewardsPage()">Close</button>
@@ -364,7 +416,7 @@
         🌐
         <div>Home</div>
       </div>
-      <div onclick="openExchangePage()">
+      <div onclick="window.location.href = 'exchange.html';">
         🔄
         <div>Exchange</div>
       </div>
@@ -392,6 +444,12 @@
         const transaction = document.getElementById("daily-transaction").value;
         const funding = document.getElementById("funding").value;
         const expectedDate = document.getElementById("expected-date").value;
+
+      // Validation for required fields
+        if (!airdropName || !website || !checkIn || !transaction || !funding || !expectedDate) {
+          alert("Please fill all the fields correctly.");
+          return;
+        }
 
         const airdrop = {
           name: airdropName,
@@ -422,6 +480,7 @@
         alert("Airdrop saved successfully!");
         updateDashboard();
       }
+
 
       // Show Saved Airdrops Page
       function showAirdropPage() {
@@ -478,7 +537,7 @@
         const activeAirdrops = savedAirdrops.length;
         document.getElementById("active-airdrops").textContent = activeAirdrops;
 
-        const progress = (activeAirdrops / 10) * 100; // Example: 10 as total number of airdrops for full completion
+        const progress = (activeAirdrops / 100) * 100; // Example: 10 as total number of airdrops for full completion
         updateProgressCircle(progress);
       }
 

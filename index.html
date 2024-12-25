@@ -537,7 +537,7 @@
         const activeAirdrops = savedAirdrops.length;
         document.getElementById("active-airdrops").textContent = activeAirdrops;
 
-        const progress = (activeAirdrops / 100) * 10; // Example: 10 as total number of airdrops for full completion
+        const progress = (activeAirdrops / 10) * 100; // Example: 10 as total number of airdrops for full completion
         updateProgressCircle(progress);
       }
 
@@ -548,7 +548,7 @@
         const circumference = 2 * Math.PI * radius;
 
         circle.style.strokeDasharray = `${circumference}`;
-        circle.style.strokeDashoffset = `${circumference - (progress / 100) * circumference}`;
+        circle.style.strokeDashoffset = `${circumference - (progress / 1000) * circumference}`;
         document.querySelector(".progress-text").textContent = `${progress}%`;
       }
 
